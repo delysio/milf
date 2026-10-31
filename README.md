@@ -18,11 +18,11 @@ drive can read its sectors.
 |---|---|
 | `milf.pas` | source code (Mad Pascal) |
 | `output/milf.xex` | the program |
-| `output/milf.atr` | bootable MyDOS 4.53 disk (DD, 180 KB) with `DOS.SYS`, `DUP.SYS` and `MILF.XEX` |
+| `output/milf.atr` | bootable MyDOS disk (DD, 180 KB) with `DOS.SYS`, `DUP.SYS` and `MILF.XEX` |
 
 ## Starting the program
 
-- Load `milf.xex` from any DOS or with an XEX loader, or
+- Load `milf.xex` from any DOS, or
 - boot `milf.atr`, then in the MyDOS menu press **L** (Load binary file)
   and type `MILF.XEX`. The disk does not start MILF automatically.
 
@@ -155,8 +155,7 @@ reads as many sectors as fit in memory and then writes them all to the
 destination, batch after batch. A drive gets
 a series of commands for consecutive sectors instead of alternating with
 the other drive, so it wastes fewer disk revolutions waiting for the next
-sector. In an Altirra test with accurate Atari 1050 emulation a whole
-720-sector disk took 172 s instead of 244 s.
+sector.
 
 - MILF shows the number of sectors to copy and the buffer size, for
   example `Copying 720 sectors.` and `Buffer: 180 sectors.` The buffer
@@ -239,11 +238,10 @@ Errors are shown with the SIO status code, among others:
 
 To build the binaries you need:
 
-- **Mad Pascal** compiler (`mp`) 1.7.8 or newer, with its `lib` and `base`
-  directories – https://github.com/tebe6502/Mad-Pascal
+- **Mad Pascal** compiler (`mp`) 1.7.8 or newer – https://github.com/tebe6502/Mad-Pascal
 - **MADS** assembler (`mads`) 2.1.9 or newer –
   https://github.com/tebe6502/Mad-Assembler
-- **MyDOS 4.53/4** files `DOS.SYS` and `DUP.SYS`, for the disk image
+- **MyDOS** files `DOS.SYS` and `DUP.SYS`, for the disk image
 - **dir2atr** from AtariSIO by Matthias Reichl, for the disk image –
   https://www.horus.com/~hias/atari/
 
@@ -272,8 +270,7 @@ double density 180 KB image.
 
 *[English version above](#milf--sector-copier-for-atari-8-bit)*
 
-MILF (*Media I'd Like to Format*, czyli „nośniki, które chciałbym
-sformatować”) 1.0 (dely/bjb 2020–2026) kopiuje dyskietki sektor po sektorze
+MILF (*Media I'd Like to Format*) 1.0 (dely/bjb 2020–2026) kopiuje dyskietki sektor po sektorze
 między
 dwiema stacjami dysków SIO Atari XL/XE. Odczytuje i zapisuje konfigurację
 stacji (PERCOM), formatuje dyskietki, dopasowuje gęstość dyskietki
@@ -289,11 +286,11 @@ dyskietki bez DOS-u – o ile stacja potrafi odczytać jej sektory.
 |---|---|
 | `milf.pas` | kod źródłowy (Mad Pascal) |
 | `output/milf.xex` | program |
-| `output/milf.atr` | startowa dyskietka MyDOS 4.53 (DD, 180 KB) z plikami `DOS.SYS`, `DUP.SYS` i `MILF.XEX` |
+| `output/milf.atr` | startowa dyskietka MyDOS (DD, 180 KB) z plikami `DOS.SYS`, `DUP.SYS` i `MILF.XEX` |
 
 ## Uruchamianie
 
-- Wczytaj `milf.xex` z dowolnego DOS-u albo loaderem plików XEX, albo
+- Wczytaj `milf.xex` z dowolnego DOS-u, albo
 - uruchom komputer z `milf.atr`, w menu MyDOS naciśnij **L** (Load binary
   file) i wpisz `MILF.XEX`. Dyskietka nie uruchamia MILF samoczynnie.
 
@@ -425,9 +422,7 @@ zgłoszonej przez stację źródłową. MILF nie pyta o zakres. Najpierw czyta
 tyle sektorów, ile zmieści się w pamięci, a potem zapisuje je wszystkie na
 stację docelową, porcja po porcji. Stacja dostaje serię poleceń dla kolejnych sektorów zamiast
 przeplatać pracę z drugą stacją, więc traci mniej obrotów dyskietki na
-czekanie na następny sektor. W teście w Altirrze z dokładną emulacją
-stacji Atari 1050 cała dyskietka 720-sektorowa kopiowała się 172 s zamiast
-244 s.
+czekanie na następny sektor.
 
 - MILF pokazuje liczbę kopiowanych sektorów i wielkość bufora, np.
   `Copying 720 sectors.` i `Buffer: 180 sectors.` Bufor zajmuje pamięć od `$6200` do `MEMTOP` (najwyżej 256
@@ -510,11 +505,10 @@ Błędy są pokazywane z kodem statusu SIO, m.in.:
 
 Do zbudowania binarek potrzebne są:
 
-- kompilator **Mad Pascal** (`mp`) 1.7.8 lub nowszy, z katalogami `lib` i
-  `base` – https://github.com/tebe6502/Mad-Pascal
+- kompilator **Mad Pascal** (`mp`) 1.7.8 lub nowszy – https://github.com/tebe6502/Mad-Pascal
 - asembler **MADS** (`mads`) 2.1.9 lub nowszy –
   https://github.com/tebe6502/Mad-Assembler
-- pliki **MyDOS 4.53/4** `DOS.SYS` i `DUP.SYS` – do obrazu dyskietki
+- pliki **MyDOS** `DOS.SYS` i `DUP.SYS` – do obrazu dyskietki
 - **dir2atr** z pakietu AtariSIO Matthiasa Reichla – do obrazu dyskietki –
   https://www.horus.com/~hias/atari/
 
