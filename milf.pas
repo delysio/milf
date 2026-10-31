@@ -857,9 +857,10 @@ end;
 
 
 
-{ fast = false: read and write sector by sector.
-  fast = true: read as many sectors as fit in memory, then write them. }
-label startSector, endSector, copyExit;
+{ fast = false: read and write a chosen range sector by sector.
+  fast = true: copy the whole disk, reading as many sectors as fit in
+  memory, then writing them. }
+label startSector, endSector, startCopy, copyExit;
 procedure copy(fast: boolean);
 var
      writeCommand: byte;
@@ -909,6 +910,12 @@ begin
                pressKey;
                goto copyExit;
           end;
+     end;
+
+     if fast then begin
+          start_sector := 1;
+          end_sector := sectors_source;
+          goto startCopy;
      end;
 
      startSector:
@@ -967,6 +974,8 @@ begin
 
                if WaitKey('YN') = 'N' then goto endSector;
           end;
+
+     startCopy:
 
      sectors_succesfully_read := 0;
      operations_number := 0;

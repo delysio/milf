@@ -1,4 +1,4 @@
-# MILF — sector copier for Atari 8-bit
+# MILF – sector copier for Atari 8-bit
 
 *[Wersja polska poniżej](#milf--kopier-sektorowy-dla-atari-8-bit)*
 
@@ -8,7 +8,7 @@ configuration (PERCOM), formats disks, matches the density of the
 destination disk to the source and can save a log of the copy operation.
 
 It talks to the drives directly through the OS SIO routine, so it copies
-any disk — DOS 2, MyDOS, SpartaDOS or non-DOS disks — as long as the
+any disk – DOS 2, MyDOS, SpartaDOS or non-DOS disks – as long as the
 drive can read its sectors.
 
 ## Files
@@ -61,26 +61,26 @@ file name, **Break** cancels the input.
 
 ## Options
 
-### R — Read drive configuration
+### R – Read drive configuration
 
 Reads the configuration of both drives again and redraws the main screen.
 Use it after changing a disk or switching a drive on.
 
-### W — Write drive configuration
+### W – Write drive configuration
 
 Sets the density of a configurable drive by sending it a PERCOM block. It
-does not format the disk — use **F** afterwards.
+does not format the disk – use **F** afterwards.
 
 1. Choose **S** (source drive) or **D** (destination drive).
 2. Choose the configuration:
 
    | Key | Format | Sectors | Capacity |
    |---|---|---|---|
-   | 1 | SS SD — single sided, single density | 720 × 128 B | 90 KB |
-   | 2 | SS ED — single sided, enhanced density | 1040 × 128 B | 130 KB |
-   | 3 | SS DD — single sided, double density | 720 × 256 B | 180 KB |
-   | 4 | DS DD — double sided, double density | 1440 × 256 B | 360 KB |
-   | 5 | DS QD — double sided, 80 tracks | 2880 × 256 B | 720 KB |
+   | 1 | SS SD – single sided, single density | 720 × 128 B | 90 KB |
+   | 2 | SS ED – single sided, enhanced density | 1040 × 128 B | 130 KB |
+   | 3 | SS DD – single sided, double density | 720 × 256 B | 180 KB |
+   | 4 | DS DD – double sided, double density | 1440 × 256 B | 360 KB |
+   | 5 | DS QD – double sided, 80 tracks | 2880 × 256 B | 720 KB |
 
 3. MILF prints `Status: OK` or `Status: error N`, reads the configuration
    back and prints `Configuration confirmed`, or `Warning. Drive may not
@@ -89,29 +89,29 @@ does not format the disk — use **F** afterwards.
 A drive that does not support PERCOM shows `This drive is not
 configurable.`
 
-### F — Format drive
+### F – Format drive
 
 1. Choose **S** (source) or **D** (destination).
 2. Confirm with **Y**: `All data on Dn will be lost. Continue? (Y/N)`.
    **N** or **Esc** cancels.
 3. A configurable drive formats the disk in its current configuration
    (set it with **W** first if needed). A drive without PERCOM asks for
-   the density: **S** — single density, 90 KB, or **E** — enhanced
+   the density: **S** – single density, 90 KB, or **E** – enhanced
    density, 130 KB.
 4. The result is shown as `Status: OK` or `Status: error N`.
 
-### D — Set source, destination drives
+### D – Set source, destination drives
 
 Type the source drive number (**1**–**8**), then the destination drive
 number. The destination must differ from the source. A drive that does
 not respond is rejected and MILF asks again. The new pair is used only
 after both numbers are given; **Esc** keeps the previous pair.
 
-### X — Exchange source and destination
+### X – Exchange source and destination
 
 Swaps the source and destination drives.
 
-### C — Copy sectors
+### C – Copy sectors
 
 Copies a range of sectors from the source to the destination drive, one
 sector at a time: read sector, write sector, next sector.
@@ -127,9 +127,9 @@ sector at a time: read sector, write sector, next sector.
    If this fails (for example the source drive does not support PERCOM),
    MILF prints `Matching failed, aborting` and restores the previous
    configuration of the destination drive. **N** returns to the menu.
-3. `Start sector:` — first sector, from 1 to the number of sectors of the
+3. `Start sector:` – first sector, from 1 to the number of sectors of the
    source disk.
-4. `End sector:` — last sector, not lower than the start sector. A number
+4. `End sector:` – last sector, not lower than the start sector. A number
    above the size reported by the drive needs confirmation (`Would you like
    to override data reported by drive?`); the sectors beyond the end of
    the disk will most likely fail to read.
@@ -146,39 +146,44 @@ sector at a time: read sector, write sector, next sector.
 
 What happens when a sector cannot be read or written is set with **O**.
 
-### M — Fast copy (memory buffer)
+### M – Fast copy (memory buffer)
 
-Same as **C**, but MILF first reads as many sectors as fit in memory and
-then writes them all to the destination, batch after batch. A drive gets
+Copies the whole disk: all sectors from 1 to the number of sectors
+reported by the source drive. MILF does not ask for a range. It first
+reads as many sectors as fit in memory and then writes them all to the
+destination, batch after batch. A drive gets
 a series of commands for consecutive sectors instead of alternating with
 the other drive, so it wastes fewer disk revolutions waiting for the next
 sector. In an Altirra test with accurate Atari 1050 emulation a whole
 720-sector disk took 172 s instead of 244 s.
 
-- After the range is entered MILF shows the buffer size, for example
-  `Buffer: 180 sectors.` The buffer takes the memory from `$6200` to
+- MILF shows the number of sectors to copy and the buffer size, for
+  example `Copying 720 sectors.` and `Buffer: 180 sectors.` The buffer
+  takes the memory from `$6200` to
   `MEMTOP` (at most 256 sectors), so its size depends on the machine and
   on the DOS; in the default setup it holds 180 single density or 90
   double density sectors.
 - Progress is shown as `Reading sector #N` and `Writing sector #N`.
 - Sectors skipped after a read error are not written.
 - Fast copy keeps **no log**, whatever the logging option says.
-- Density matching, range checks and error handling work as in **C**.
+- The ready checks of both drives, density matching and error handling
+  work as in **C**.
+- To copy only part of a disk use **C**.
 
-### O — Set options
+### O – Set options
 
 Asks four questions in turn; **Esc** leaves the remaining options
 unchanged.
 
-1. `Log copy operations? (Y/N)` — keep a log during **C** (default: yes).
-2. `Verify writes? (Y/N)` — write with the *Put sector with verify*
+1. `Log copy operations? (Y/N)` – keep a log during **C** (default: yes).
+2. `Verify writes? (Y/N)` – write with the *Put sector with verify*
    command (`$57`) instead of *Put sector* (`$50`) (default: no). Slower,
    but the drive checks every written sector.
 3. `Auto action when copy error occured:` (default: 1)
 
    | Key | Action |
    |---|---|
-   | 1 | ask — show `Error N reading/writing sector S.` and wait for **A** (abort), **R** (retry), **S** (skip) or, after a read error, **W** (write the buffer and continue) |
+   | 1 | ask – show `Error N reading/writing sector S.` and wait for **A** (abort), **R** (retry), **S** (skip) or, after a read error, **W** (write the buffer and continue) |
    | 2 | abort the copy |
    | 3 | retry the operation, then skip the sector |
    | 4 | skip the sector |
@@ -190,11 +195,11 @@ unchanged.
 Before every read the buffer is filled with zeros, so **W** / action 5
 write zeros plus whatever the drive managed to send.
 
-### Q — Exit to DOS
+### Q – Exit to DOS
 
 Jumps to DOS through `DOSVEC`.
 
-### B — Cold start
+### B – Cold start
 
 Restarts the computer (cold start of the OS).
 
@@ -211,7 +216,7 @@ The log is a plain ATASCII text file with one line per operation:
 ```
 
 The sector number is right aligned in four characters, followed by `:`
-and a code: **o** — sector read, **r** — read error, **w** — write error.
+and a code: **o** – sector read, **r** – read error, **w** – write error.
 Successful writes are not logged. A retried sector appears once per
 attempt. The log holds up to 2880 lines and is limited by the free memory;
 when it fills up MILF reports `Due to memory limit, log file is truncated.`
@@ -222,23 +227,23 @@ Errors are shown with the SIO status code, among others:
 
 | Code | Meaning |
 |---|---|
-| 138 | timeout — the drive does not respond |
-| 139 | NAK — the drive rejected the command |
+| 138 | timeout – the drive does not respond |
+| 139 | NAK – the drive rejected the command |
 | 140 | serial bus framing error |
 | 142 | serial bus overrun |
 | 143 | checksum error |
-| 144 | device error — e.g. bad sector, write-protected disk |
+| 144 | device error – e.g. bad sector, write-protected disk |
 
 ## Building from source
 
 To build the binaries you need:
 
 - **Mad Pascal** compiler (`mp`) 1.7.8 or newer, with its `lib` and `base`
-  directories — https://github.com/tebe6502/Mad-Pascal
-- **MADS** assembler (`mads`) 2.1.9 or newer —
+  directories – https://github.com/tebe6502/Mad-Pascal
+- **MADS** assembler (`mads`) 2.1.9 or newer –
   https://github.com/tebe6502/Mad-Assembler
 - **MyDOS 4.53/4** files `DOS.SYS` and `DUP.SYS`, for the disk image
-- **dir2atr** from AtariSIO by Matthias Reichl, for the disk image —
+- **dir2atr** from AtariSIO by Matthias Reichl, for the disk image –
   https://www.horus.com/~hias/atari/
 
 ```
@@ -262,7 +267,7 @@ double density 180 KB image.
 
 ---
 
-# MILF — kopier sektorowy dla Atari 8-bit
+# MILF – kopier sektorowy dla Atari 8-bit
 
 *[English version above](#milf--sector-copier-for-atari-8-bit)*
 
@@ -272,8 +277,8 @@ stacji (PERCOM), formatuje dyskietki, dopasowuje gęstość dyskietki
 docelowej do źródłowej i może zapisać log z przebiegu kopiowania.
 
 Program rozmawia ze stacjami bezpośrednio przez procedurę SIO systemu
-operacyjnego, więc kopiuje dowolną dyskietkę — DOS 2, MyDOS, SpartaDOS czy
-dyskietki bez DOS-u — o ile stacja potrafi odczytać jej sektory.
+operacyjnego, więc kopiuje dowolną dyskietkę – DOS 2, MyDOS, SpartaDOS czy
+dyskietki bez DOS-u – o ile stacja potrafi odczytać jej sektory.
 
 ## Pliki
 
@@ -325,26 +330,26 @@ nazwę pliku, **Break** przerywa wpisywanie.
 
 ## Opcje
 
-### R — Read drive configuration (odczyt konfiguracji)
+### R – Read drive configuration (odczyt konfiguracji)
 
 Ponownie odczytuje konfigurację obu stacji i odświeża ekran główny. Przydaje
 się po zmianie dyskietki albo włączeniu stacji.
 
-### W — Write drive configuration (zapis konfiguracji)
+### W – Write drive configuration (zapis konfiguracji)
 
 Ustawia gęstość stacji konfigurowalnej, wysyłając jej blok PERCOM. Nie
-formatuje dyskietki — do tego służy potem **F**.
+formatuje dyskietki – do tego służy potem **F**.
 
 1. Wybierz **S** (stacja źródłowa) albo **D** (stacja docelowa).
 2. Wybierz konfigurację:
 
    | Klawisz | Format | Sektory | Pojemność |
    |---|---|---|---|
-   | 1 | SS SD — jednostronna, pojedyncza gęstość | 720 × 128 B | 90 KB |
-   | 2 | SS ED — jednostronna, gęstość rozszerzona | 1040 × 128 B | 130 KB |
-   | 3 | SS DD — jednostronna, podwójna gęstość | 720 × 256 B | 180 KB |
-   | 4 | DS DD — dwustronna, podwójna gęstość | 1440 × 256 B | 360 KB |
-   | 5 | DS QD — dwustronna, 80 ścieżek | 2880 × 256 B | 720 KB |
+   | 1 | SS SD – jednostronna, pojedyncza gęstość | 720 × 128 B | 90 KB |
+   | 2 | SS ED – jednostronna, gęstość rozszerzona | 1040 × 128 B | 130 KB |
+   | 3 | SS DD – jednostronna, podwójna gęstość | 720 × 256 B | 180 KB |
+   | 4 | DS DD – dwustronna, podwójna gęstość | 1440 × 256 B | 360 KB |
+   | 5 | DS QD – dwustronna, 80 ścieżek | 2880 × 256 B | 720 KB |
 
 3. MILF wypisuje `Status: OK` albo `Status: error N`, odczytuje konfigurację
    z powrotem i wypisuje `Configuration confirmed` albo `Warning. Drive may
@@ -352,28 +357,28 @@ formatuje dyskietki — do tego służy potem **F**.
 
 Stacja bez obsługi PERCOM pokazuje `This drive is not configurable.`
 
-### F — Format drive (formatowanie)
+### F – Format drive (formatowanie)
 
 1. Wybierz **S** (źródło) albo **D** (cel).
 2. Potwierdź klawiszem **Y**: `All data on Dn will be lost. Continue?
    (Y/N)`. **N** albo **Esc** rezygnuje.
 3. Stacja konfigurowalna formatuje dyskietkę w bieżącej konfiguracji (w
    razie potrzeby ustaw ją najpierw opcją **W**). Stacja bez PERCOM pyta o
-   gęstość: **S** — pojedyncza, 90 KB, albo **E** — rozszerzona, 130 KB.
+   gęstość: **S** – pojedyncza, 90 KB, albo **E** – rozszerzona, 130 KB.
 4. Wynik pojawia się jako `Status: OK` albo `Status: error N`.
 
-### D — Set source, destination drives (wybór stacji)
+### D – Set source, destination drives (wybór stacji)
 
 Wpisz numer stacji źródłowej (**1**–**8**), a potem docelowej. Stacja
 docelowa musi być inna niż źródłowa. Stacja, która nie odpowiada, zostaje
 odrzucona i MILF pyta ponownie. Nowa para obowiązuje dopiero po podaniu
 obu numerów; **Esc** zostawia poprzednią.
 
-### X — Exchange source and destination (zamiana stacji)
+### X – Exchange source and destination (zamiana stacji)
 
 Zamienia stację źródłową z docelową.
 
-### C — Copy sectors (kopiowanie)
+### C – Copy sectors (kopiowanie)
 
 Kopiuje zakres sektorów ze stacji źródłowej na docelową, sektor po
 sektorze: odczyt sektora, zapis sektora, następny sektor.
@@ -389,9 +394,9 @@ sektorze: odczyt sektora, zapis sektora, następny sektor.
    to się nie uda (np. stacja źródłowa nie obsługuje PERCOM), MILF wypisuje
    `Matching failed, aborting` i przywraca poprzednią konfigurację stacji
    docelowej. **N** wraca do menu.
-3. `Start sector:` — pierwszy sektor, od 1 do liczby sektorów dyskietki
+3. `Start sector:` – pierwszy sektor, od 1 do liczby sektorów dyskietki
    źródłowej.
-4. `End sector:` — ostatni sektor, nie mniejszy niż początkowy. Liczba
+4. `End sector:` – ostatni sektor, nie mniejszy niż początkowy. Liczba
    większa niż rozmiar zgłaszany przez stację wymaga potwierdzenia (`Would
    you like to override data reported by drive?`); sektory za końcem
    dyskietki najpewniej nie dadzą się odczytać.
@@ -410,42 +415,44 @@ sektorze: odczyt sektora, zapis sektora, następny sektor.
 Co się dzieje, gdy sektora nie da się odczytać lub zapisać, ustawia się
 opcją **O**.
 
-### M — Fast copy (szybkie kopiowanie przez pamięć)
+### M – Fast copy (szybkie kopiowanie przez pamięć)
 
-Działa jak **C**, ale MILF najpierw czyta tyle sektorów, ile zmieści się w
-pamięci, a potem zapisuje je wszystkie na stację docelową, porcja po
-porcji. Stacja dostaje serię poleceń dla kolejnych sektorów zamiast
+Kopiuje całą dyskietkę: wszystkie sektory od 1 do liczby sektorów
+zgłoszonej przez stację źródłową. MILF nie pyta o zakres. Najpierw czyta
+tyle sektorów, ile zmieści się w pamięci, a potem zapisuje je wszystkie na
+stację docelową, porcja po porcji. Stacja dostaje serię poleceń dla kolejnych sektorów zamiast
 przeplatać pracę z drugą stacją, więc traci mniej obrotów dyskietki na
 czekanie na następny sektor. W teście w Altirrze z dokładną emulacją
 stacji Atari 1050 cała dyskietka 720-sektorowa kopiowała się 172 s zamiast
 244 s.
 
-- Po podaniu zakresu MILF pokazuje wielkość bufora, np. `Buffer: 180
-  sectors.` Bufor zajmuje pamięć od `$6200` do `MEMTOP` (najwyżej 256
+- MILF pokazuje liczbę kopiowanych sektorów i wielkość bufora, np.
+  `Copying 720 sectors.` i `Buffer: 180 sectors.` Bufor zajmuje pamięć od `$6200` do `MEMTOP` (najwyżej 256
   sektorów), więc jego wielkość zależy od komputera i DOS-u; w typowej
   konfiguracji mieści 180 sektorów pojedynczej albo 90 podwójnej gęstości.
 - Postęp widać jako `Reading sector #N` i `Writing sector #N`.
 - Sektory pominięte po błędzie odczytu nie są zapisywane.
 - Szybkie kopiowanie **nie prowadzi logu**, niezależnie od ustawienia
   opcji logowania.
-- Dopasowanie gęstości, sprawdzanie zakresu i obsługa błędów działają jak
-  w **C**.
+- Sprawdzanie gotowości obu stacji, dopasowanie gęstości i obsługa błędów
+  działają jak w **C**.
+- Aby skopiować tylko część dyskietki, użyj **C**.
 
-### O — Set options (ustawienia)
+### O – Set options (ustawienia)
 
 Zadaje po kolei cztery pytania; **Esc** zostawia pozostałe ustawienia bez
 zmian.
 
-1. `Log copy operations? (Y/N)` — prowadzenie logu podczas **C** (domyślnie:
+1. `Log copy operations? (Y/N)` – prowadzenie logu podczas **C** (domyślnie:
    tak).
-2. `Verify writes? (Y/N)` — zapis poleceniem *Put sector with verify*
+2. `Verify writes? (Y/N)` – zapis poleceniem *Put sector with verify*
    (`$57`) zamiast *Put sector* (`$50`) (domyślnie: nie). Wolniej, ale
    stacja sprawdza każdy zapisany sektor.
 3. `Auto action when copy error occured:` (domyślnie: 1)
 
    | Klawisz | Działanie |
    |---|---|
-   | 1 | pytaj — pokazuje `Error N reading/writing sector S.` i czeka na **A** (przerwij), **R** (ponów), **S** (pomiń) albo, po błędzie odczytu, **W** (zapisz bufor i kontynuuj) |
+   | 1 | pytaj – pokazuje `Error N reading/writing sector S.` i czeka na **A** (przerwij), **R** (ponów), **S** (pomiń) albo, po błędzie odczytu, **W** (zapisz bufor i kontynuuj) |
    | 2 | przerwij kopiowanie |
    | 3 | ponawiaj operację, potem pomiń sektor |
    | 4 | pomiń sektor |
@@ -457,11 +464,11 @@ zmian.
 Przed każdym odczytem bufor jest wypełniany zerami, więc **W** i działanie
 5 zapisują zera plus to, co stacja zdążyła przesłać.
 
-### Q — Exit to DOS (wyjście do DOS-u)
+### Q – Exit to DOS (wyjście do DOS-u)
 
 Skacze do DOS-u przez `DOSVEC`.
 
-### B — Cold start (zimny start)
+### B – Cold start (zimny start)
 
 Uruchamia komputer od nowa (zimny start systemu).
 
@@ -478,7 +485,7 @@ Log to zwykły plik tekstowy ATASCII, jedna linia na operację:
 ```
 
 Numer sektora jest wyrównany do prawej na czterech znakach, potem `:` i
-kod: **o** — sektor odczytany, **r** — błąd odczytu, **w** — błąd zapisu.
+kod: **o** – sektor odczytany, **r** – błąd odczytu, **w** – błąd zapisu.
 Udane zapisy nie są logowane. Ponawiany sektor pojawia się raz na każdą
 próbę. Log mieści do 2880 linii i jest ograniczony wolną pamięcią; gdy się
 zapełni, MILF zgłasza `Due to memory limit, log file is truncated.`
@@ -489,23 +496,23 @@ Błędy są pokazywane z kodem statusu SIO, m.in.:
 
 | Kod | Znaczenie |
 |---|---|
-| 138 | przekroczenie czasu — stacja nie odpowiada |
-| 139 | NAK — stacja odrzuciła polecenie |
+| 138 | przekroczenie czasu – stacja nie odpowiada |
+| 139 | NAK – stacja odrzuciła polecenie |
 | 140 | błąd ramki na szynie szeregowej |
 | 142 | przepełnienie na szynie szeregowej |
 | 143 | błąd sumy kontrolnej |
-| 144 | błąd urządzenia — np. uszkodzony sektor, dyskietka zabezpieczona przed zapisem |
+| 144 | błąd urządzenia – np. uszkodzony sektor, dyskietka zabezpieczona przed zapisem |
 
 ## Budowanie ze źródeł
 
 Do zbudowania binarek potrzebne są:
 
 - kompilator **Mad Pascal** (`mp`) 1.7.8 lub nowszy, z katalogami `lib` i
-  `base` — https://github.com/tebe6502/Mad-Pascal
-- asembler **MADS** (`mads`) 2.1.9 lub nowszy —
+  `base` – https://github.com/tebe6502/Mad-Pascal
+- asembler **MADS** (`mads`) 2.1.9 lub nowszy –
   https://github.com/tebe6502/Mad-Assembler
-- pliki **MyDOS 4.53/4** `DOS.SYS` i `DUP.SYS` — do obrazu dyskietki
-- **dir2atr** z pakietu AtariSIO Matthiasa Reichla — do obrazu dyskietki —
+- pliki **MyDOS 4.53/4** `DOS.SYS` i `DUP.SYS` – do obrazu dyskietki
+- **dir2atr** z pakietu AtariSIO Matthiasa Reichla – do obrazu dyskietki –
   https://www.horus.com/~hias/atari/
 
 ```
