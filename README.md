@@ -2,7 +2,8 @@
 
 *[Wersja polska poniżej](#milf--kopier-sektorowy-dla-atari-8-bit)*
 
-MILF 0.9 (dely/bjb 2020–2021) copies floppy disks sector by sector between
+MILF (*Media I'd Like to Format*) 0.9 (dely/bjb 2020–2026) copies floppy
+disks sector by sector between
 two SIO disk drives of an Atari XL/XE. It reads and writes the drive
 configuration (PERCOM), formats disks, matches the density of the
 destination disk to the source and can save a log of the copy operation.
@@ -271,7 +272,9 @@ double density 180 KB image.
 
 *[English version above](#milf--sector-copier-for-atari-8-bit)*
 
-MILF 0.9 (dely/bjb 2020–2021) kopiuje dyskietki sektor po sektorze między
+MILF (*Media I'd Like to Format*, czyli „nośniki, które chciałbym
+sformatować”) 0.9 (dely/bjb 2020–2026) kopiuje dyskietki sektor po sektorze
+między
 dwiema stacjami dysków SIO Atari XL/XE. Odczytuje i zapisuje konfigurację
 stacji (PERCOM), formatuje dyskietki, dopasowuje gęstość dyskietki
 docelowej do źródłowej i może zapisać log z przebiegu kopiowania.

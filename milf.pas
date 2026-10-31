@@ -1204,7 +1204,7 @@ begin
      ClrScr;
      clearPercomBuffer;
 
-     writeln ('MILF 0.9 - dely/bjb 2020-2021');
+     writeln ('MILF 0.9 - dely/bjb 2020-2026');
      writeln;
 
      writeMenu;
