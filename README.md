@@ -264,6 +264,15 @@ dir2atr -b MyDos4534 -D output\milf.atr <directory>
 `-b MyDos4534` writes the MyDOS 4.53/4 boot sectors and `-D` creates a
 double density 180 KB image.
 
+## License
+
+Copyright (C) 2020–2026 dely/bjb
+
+MILF is free software released under the GNU General Public License
+version 3 – see [LICENSE](LICENSE). You may use, modify and distribute
+it, but any distributed modified version must also be released under the
+GPL v3 together with its source code.
+
 ---
 
 # MILF – kopier sektorowy dla Atari 8-bit
@@ -530,3 +539,12 @@ dir2atr -b MyDos4534 -D output\milf.atr <katalog>
 
 `-b MyDos4534` zapisuje sektory startowe MyDOS 4.53/4, a `-D` tworzy obraz
 o podwójnej gęstości, 180 KB.
+
+## Licencja
+
+Copyright (C) 2020–2026 dely/bjb
+
+MILF jest wolnym oprogramowaniem udostępnionym na licencji GNU General
+Public License w wersji 3 – zob. [LICENSE](LICENSE). Można go używać,
+zmieniać i rozpowszechniać, ale każdą rozpowszechnianą zmienioną wersję
+trzeba również udostępnić na licencji GPL v3 razem z kodem źródłowym.
