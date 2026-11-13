@@ -1,6 +1,6 @@
 program MILF;
 
-uses atari, crt;
+uses atari, crt, misc;
 
 const
 
@@ -46,7 +46,15 @@ const
 
      { Fast copy: sectors held in memory between the read and write pass }
 
-     MAX_BATCH_SECTORS   = 256;
+     MAX_BATCH_SECTORS   = 2880;
+
+     { Extended memory: 16 KB banks switched by PORTB into $4000-$7FFF,
+       found by DetectMem (misc), which fills banks[] with their PORTB
+       values. SIO reads and writes sectors there directly. }
+
+     BANK_WINDOW         = $4000;
+     BANK_END            = $8000;
+     BANK_SIZE           = $4000;
 
      { copyError results }
 
@@ -118,7 +126,17 @@ var
      sectors_succesfully_read      : word;
      progressLabel                 : string[28];
      progressShown                 : boolean;
-     skipSector                    : array[0..MAX_BATCH_SECTORS - 1] of boolean;
+     skipBits                      : array[0..MAX_BATCH_SECTORS div 8 - 1] of byte;
+
+     extBanks                      : byte;
+     useExtMemory                  : boolean;
+     sioBank                       : byte;     { PORTB value for SIO, 0 = main memory }
+
+     { Fast copy buffer slots }
+     slot                          : word;
+     slotBuffer                    : word;
+     slotBank                      : byte;
+     mainSlots                     : word;
 
      autoAction                    : byte;
      maxRetries                    : integer;
@@ -169,12 +187,51 @@ begin
      DBYT   := size;
      DAUX   := aux;
 
+     { With sioBank <> 0 the buffer lies in that bank of extended memory: the
+       bank is switched in around SIOV, and before a read the buffer is
+       cleared there, as readSector does in main memory. This code must not
+       lie in the bank window itself. }
+
      asm {
           txa:pha
-          jsr  $E459
+          lda  portb
+          pha
+
+          lda  sioBank
+          beq  sio_call
+          sta  portb
+
+          lda  DSTATS
+          cmp  #$40
+          bne  sio_call
+
+          lda  DBUF
+          sta  sio_clear+1
+          lda  DBUF+1
+          sta  sio_clear+2
+          ldx  DBYT            ; bytes in a partial page
+          ldy  DBYT+1          ; whole pages
+          cpx  #0
+          beq  sio_zero
+          iny
+sio_zero  lda  #0
+sio_loop  dex
+sio_clear sta  $ffff,x
+          cpx  #0
+          bne  sio_loop
+          inc  sio_clear+2
+          dey
+          bne  sio_loop
+
+sio_call  jsr  $E459
+
+          pla
+          sta  portb
           pla:tax
 
           sty  SIOresult
+
+          ert  * > $4000
      };
 
 end;
@@ -814,7 +871,8 @@ begin
 
           showProgress;
 
-          fillbyte(pointer(buffer), sector_length, 0);
+          { a buffer in extended memory is cleared by exec_sio }
+          if sioBank = 0 then fillbyte(pointer(buffer), sector_length, 0);
           exec_sio(source_drive, READ_SECTOR, SIO_READ, $7, buffer, sector_length, current_sector);
 
           if SIOresult > 127 then begin
@@ -857,6 +915,38 @@ end;
 
 
 
+{ Fast copy buffer: mainSlots sectors from LOG_BUFFER up to MEMTOP, then
+  the banks of extended memory. firstSlot and nextSlot set slot,
+  slotBuffer and sioBank for the current sector. }
+procedure firstSlot;
+begin
+     slot := 0;
+     slotBuffer := LOG_BUFFER;
+     slotBank := 0;
+     sioBank := 0;
+end;
+
+
+
+procedure nextSlot;
+begin
+     inc(slot);
+     inc(slotBuffer, bytes_per_sector_source);
+
+     if sioBank = 0 then begin
+          if slot = mainSlots then begin
+               slotBuffer := BANK_WINDOW;
+               sioBank := banks[0] or 1;     { keep the OS ROM on }
+          end;
+     end else if slotBuffer = BANK_END then begin
+          inc(slotBank);
+          slotBuffer := BANK_WINDOW;
+          sioBank := banks[slotBank] or 1;
+     end;
+end;
+
+
+
 { fast = false: read and write a chosen range sector by sector.
   fast = true: copy the whole disk, reading as many sectors as fit in
   memory, then writing them. }
@@ -867,12 +957,10 @@ var
      action: byte;
      aborted: boolean;
      last_sector: word;
-     buffer_start: word;
-     buffer: word;
      batch_sectors: word;
      batch_first: word;
      batch_last: word;
-     slot: word;
+     mask: byte;
 begin
 
      readPercom(source_drive, true, 's');
@@ -995,8 +1083,10 @@ begin
           if log_capacity > LOG_MAX_RECORDS then log_capacity := LOG_MAX_RECORDS;
      end;
 
-     buffer_start := LOG_BUFFER;
-     batch_sectors := (MEMTOP + 1 - buffer_start) div bytes_per_sector_source;
+     mainSlots := (MEMTOP + 1 - LOG_BUFFER) div bytes_per_sector_source;
+     batch_sectors := mainSlots;
+     if useExtMemory then
+          inc(batch_sectors, extBanks * (BANK_SIZE div bytes_per_sector_source));
      if batch_sectors > MAX_BATCH_SECTORS then batch_sectors := MAX_BATCH_SECTORS;
 
      writeln('Copying ', sectors_to_read, ' sectors.');
@@ -1048,38 +1138,40 @@ begin
                { Read pass }
 
                setProgress('Reading sector #');
-               slot := 0;
-               buffer := buffer_start;
+               firstSlot;
 
                while current_sector <= batch_last do begin
-                    action := readSector(buffer, sectorLength(current_sector));
+                    action := readSector(slotBuffer, sectorLength(current_sector));
                     if action = ACTION_ABORT then begin aborted := true; break; end;
-                    skipSector[slot] := action = ACTION_SKIP;
-                    inc(slot);
-                    inc(buffer, bytes_per_sector_source);
+                    mask := 1 shl (slot and 7);
+                    if action = ACTION_SKIP then
+                         skipBits[slot shr 3] := skipBits[slot shr 3] or mask
+                    else
+                         skipBits[slot shr 3] := skipBits[slot shr 3] and not mask;
+                    nextSlot;
                     inc(current_sector);
                end;
 
+               sioBank := 0;
                if aborted then break;
 
                { Write pass, sectors skipped while reading are not written }
 
                setProgress('Writing sector #');
-               slot := 0;
-               buffer := buffer_start;
+               firstSlot;
                current_sector := batch_first;
 
                while current_sector <= batch_last do begin
-                    if not skipSector[slot] then
-                         if writeSector(buffer, sectorLength(current_sector), writeCommand) = ACTION_ABORT then begin
+                    if (skipBits[slot shr 3] and (1 shl (slot and 7))) = 0 then
+                         if writeSector(slotBuffer, sectorLength(current_sector), writeCommand) = ACTION_ABORT then begin
                               aborted := true;
                               break;
                          end;
-                    inc(slot);
-                    inc(buffer, bytes_per_sector_source);
+                    nextSlot;
                     inc(current_sector);
                end;
 
+               sioBank := 0;
                if aborted then break;
 
           end;
@@ -1177,6 +1269,26 @@ begin
 
      end;
 
+     { Extended memory: asked about only when it is present }
+
+     extBanks := DetectMem;
+
+     if extBanks = 0 then
+          useExtMemory := false
+     else begin
+          writeln;
+          writeln ('Extended memory found: ', word(extBanks) * 16, ' KB.');
+          writeln ('Data kept there, e.g. a RAM disk,');
+          writeln ('will be lost.');
+          writeln ('Use it as fast copy buffer? (Y/N)');
+
+          case WaitKey('YN'#27) of
+               'Y': useExtMemory := true;
+               'N': useExtMemory := false;
+               else goto optionsAbort;
+          end;
+     end;
+
      optionsAbort:
 
      writeMenu;
@@ -1200,6 +1312,10 @@ begin
 
      source_drive := 1;
      dest_drive   := 2;
+
+     extBanks     := 0;
+     useExtMemory := false;
+     sioBank      := 0;
 
      ClrScr;
      clearPercomBuffer;

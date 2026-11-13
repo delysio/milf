@@ -28,7 +28,9 @@ drive can read its sectors.
 
 The program needs an Atari XL/XE with at least 64 KB of RAM. It uses the
 memory from `$2500` to the top of free RAM (`MEMTOP`); turning BASIC off
-gives more room for the log and the fast-copy buffer.
+gives more room for the log and the fast-copy buffer. Extended memory
+(130XE and compatible expansions, up to 1 MB) can serve as a larger
+fast-copy buffer, see **O**.
 
 ## Main screen
 
@@ -159,10 +161,14 @@ sector.
 
 - MILF shows the number of sectors to copy and the buffer size, for
   example `Copying 720 sectors.` and `Buffer: 180 sectors.` The buffer
-  takes the memory from `$6200` to
-  `MEMTOP` (at most 256 sectors), so its size depends on the machine and
-  on the DOS; in the default setup it holds 180 single density or 90
-  double density sectors.
+  takes the memory from `$6200` to `MEMTOP`, so its size depends on the
+  machine and on the DOS; in the default setup it holds 180 single
+  density or 90 double density sectors.
+- When extended memory is switched on with **O**, every 16 KB bank adds
+  128 single density or 64 double density sectors to the buffer (at most
+  2880 sectors in total). A 130XE buffer holds 692 single density or 346
+  double density sectors; with 256 KB of extended memory a whole single
+  density disk fits in one batch.
 - Progress is shown as `Reading sector #N` and `Writing sector #N`.
 - Sectors skipped after a read error are not written.
 - Fast copy keeps **no log**, whatever the logging option says.
@@ -172,7 +178,7 @@ sector.
 
 ### O – Set options
 
-Asks four questions in turn; **Esc** leaves the remaining options
+Asks up to five questions in turn; **Esc** leaves the remaining options
 unchanged.
 
 1. `Log copy operations? (Y/N)` – keep a log during **C** (default: yes).
@@ -191,6 +197,16 @@ unchanged.
 
 4. Only for action 3: `Retry attempts (1-99)` (default: 3). The limit
    applies separately to every sector and to its reading and writing.
+5. Only when extended memory is found: `Extended memory found: N KB.`
+   and `Use it as fast copy buffer? (Y/N)` (default: no). Every time the
+   options are set MILF looks for 16 KB banks switched with `PORTB` into
+   `$4000`–`$7FFF` (130XE, RAMBO, Compy Shop and compatible expansions,
+   up to 1 MB) with `DetectMem` from the Mad Pascal `misc` unit; the check
+   leaves the contents of extended memory unchanged. With **Y** fast
+   copy (**M**) uses the banks after the main memory buffer, and whatever
+   was kept in extended memory, for example a RAM disk, is overwritten.
+   Without extended memory MILF shows nothing, skips the question and
+   leaves the option off.
 
 Before every read the buffer is filled with zeros, so **W** / action 5
 write zeros plus whatever the drive managed to send.
@@ -305,7 +321,9 @@ dyskietki bez DOS-u – o ile stacja potrafi odczytać jej sektory.
 
 Program wymaga Atari XL/XE z co najmniej 64 KB RAM. Używa pamięci od
 `$2500` do końca wolnej pamięci (`MEMTOP`); wyłączenie BASIC-u daje więcej
-miejsca na log i bufor szybkiego kopiowania.
+miejsca na log i bufor szybkiego kopiowania. Rozszerzenie pamięci (130XE i
+zgodne, do 1 MB) może posłużyć jako większy bufor szybkiego kopiowania,
+zob. **O**.
 
 ## Ekran główny
 
@@ -434,9 +452,15 @@ przeplatać pracę z drugą stacją, więc traci mniej obrotów dyskietki na
 czekanie na następny sektor.
 
 - MILF pokazuje liczbę kopiowanych sektorów i wielkość bufora, np.
-  `Copying 720 sectors.` i `Buffer: 180 sectors.` Bufor zajmuje pamięć od `$6200` do `MEMTOP` (najwyżej 256
-  sektorów), więc jego wielkość zależy od komputera i DOS-u; w typowej
-  konfiguracji mieści 180 sektorów pojedynczej albo 90 podwójnej gęstości.
+  `Copying 720 sectors.` i `Buffer: 180 sectors.` Bufor zajmuje pamięć od
+  `$6200` do `MEMTOP`, więc jego wielkość zależy od komputera i DOS-u; w
+  typowej konfiguracji mieści 180 sektorów pojedynczej albo 90 podwójnej
+  gęstości.
+- Gdy opcją **O** włączysz rozszerzenie pamięci, każdy 16-kilobajtowy bank
+  dodaje do bufora 128 sektorów pojedynczej albo 64 podwójnej gęstości
+  (razem najwyżej 2880 sektorów). Na 130XE bufor mieści 692 sektory
+  pojedynczej albo 346 podwójnej gęstości; z 256 KB rozszerzenia cała
+  dyskietka o pojedynczej gęstości mieści się w jednej porcji.
 - Postęp widać jako `Reading sector #N` i `Writing sector #N`.
 - Sektory pominięte po błędzie odczytu nie są zapisywane.
 - Szybkie kopiowanie **nie prowadzi logu**, niezależnie od ustawienia
@@ -447,7 +471,7 @@ czekanie na następny sektor.
 
 ### O – Set options (ustawienia)
 
-Zadaje po kolei cztery pytania; **Esc** zostawia pozostałe ustawienia bez
+Zadaje po kolei do pięciu pytań; **Esc** zostawia pozostałe ustawienia bez
 zmian.
 
 1. `Log copy operations? (Y/N)` – prowadzenie logu podczas **C** (domyślnie:
@@ -467,6 +491,16 @@ zmian.
 
 4. Tylko dla działania 3: `Retry attempts (1-99)` (domyślnie: 3). Limit
    dotyczy osobno każdego sektora oraz jego odczytu i zapisu.
+5. Tylko gdy MILF znajdzie rozszerzenie pamięci:
+   `Extended memory found: N KB.` i `Use it as fast copy buffer? (Y/N)`
+   (domyślnie: nie). Przy każdym ustawianiu opcji MILF szuka
+   16-kilobajtowych banków przełączanych rejestrem `PORTB` w obszarze
+   `$4000`–`$7FFF` (130XE, RAMBO, Compy Shop i zgodne rozszerzenia, do
+   1 MB) procedurą `DetectMem` z modułu `misc` Mad Pascala; sprawdzanie nie
+   zmienia zawartości rozszerzenia. Po **Y** szybkie kopiowanie (**M**)
+   używa banków po buforze w pamięci podstawowej, a to, co było w
+   rozszerzeniu, np. RAM-dysk, zostaje nadpisane. Bez rozszerzenia MILF nic nie wypisuje, pomija pytanie i
+   zostawia opcję wyłączoną.
 
 Przed każdym odczytem bufor jest wypełniany zerami, więc **W** i działanie
 5 zapisują zera plus to, co stacja zdążyła przesłać.
