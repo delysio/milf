@@ -2,7 +2,7 @@
 
 *[Wersja polska poniżej](#milf--kopier-sektorowy-dla-atari-8-bit)*
 
-MILF (*Media I'd Like to Format*) 1.0 (dely/bjb 2020–2026) copies floppy
+MILF (*Media I'd Like to Format*) 1.1 (dely/bjb 2020–2026) copies floppy
 disks sector by sector between
 two SIO disk drives of an Atari XL/XE. It reads and writes the drive
 configuration (PERCOM), formats disks, matches the density of the
@@ -176,6 +176,32 @@ sector.
   work as in **C**.
 - To copy only part of a disk use **C**.
 
+#### Copying whole disks through extended memory
+
+1. Press **O** and answer the questions. The last one,
+   `Use it as fast copy buffer? (Y/N)`, appears only when MILF finds
+   extended memory; answer **Y**.
+2. Press **M**. `Buffer: N sectors.` now counts the main memory buffer
+   together with the banks of extended memory.
+3. MILF reads as much of the source disk as fits in the buffer, then
+   writes it to the destination. When the whole disk fits, the source
+   drive reads it in one go and the destination drive writes it in one
+   go.
+
+The setting stays on until it is changed with **O** or MILF is started
+again; **Esc** at the extended memory question leaves it as it was.
+
+Number of batches needed for a whole disk, with the default 180 / 90
+sector main memory buffer:
+
+| Disk | Sectors | 64 KB, no extended memory | 130XE (64 KB extended) | 256 KB extended | 512 KB extended | 1 MB extended |
+|---|---|---|---|---|---|---|
+| SS SD | 720 × 128 B | 4 | 2 | 1 | 1 | 1 |
+| SS ED | 1040 × 128 B | 6 | 2 | 1 | 1 | 1 |
+| SS DD | 720 × 256 B | 8 | 3 | 1 | 1 | 1 |
+| DS DD | 1440 × 256 B | 16 | 5 | 2 | 1 | 1 |
+| DS QD | 2880 × 256 B | 32 | 9 | 3 | 2 | 1 |
+
 ### O – Set options
 
 Asks up to five questions in turn; **Esc** leaves the remaining options
@@ -295,7 +321,7 @@ GPL v3 together with its source code.
 
 *[English version above](#milf--sector-copier-for-atari-8-bit)*
 
-MILF (*Media I'd Like to Format*) 1.0 (dely/bjb 2020–2026) kopiuje dyskietki sektor po sektorze
+MILF (*Media I'd Like to Format*) 1.1 (dely/bjb 2020–2026) kopiuje dyskietki sektor po sektorze
 między
 dwiema stacjami dysków SIO Atari XL/XE. Odczytuje i zapisuje konfigurację
 stacji (PERCOM), formatuje dyskietki, dopasowuje gęstość dyskietki
@@ -468,6 +494,32 @@ czekanie na następny sektor.
 - Sprawdzanie gotowości obu stacji, dopasowanie gęstości i obsługa błędów
   działają jak w **C**.
 - Aby skopiować tylko część dyskietki, użyj **C**.
+
+#### Kopiowanie całych dyskietek przez rozszerzenie pamięci
+
+1. Naciśnij **O** i odpowiedz na pytania. Ostatnie,
+   `Use it as fast copy buffer? (Y/N)`, pojawia się tylko wtedy, gdy MILF
+   znajdzie rozszerzenie pamięci; odpowiedz **Y**.
+2. Naciśnij **M**. `Buffer: N sectors.` liczy teraz bufor w pamięci
+   podstawowej razem z bankami rozszerzenia.
+3. MILF czyta tyle dyskietki źródłowej, ile zmieści się w buforze, i
+   zapisuje to na docelową. Gdy cała dyskietka się mieści, stacja źródłowa
+   czyta ją za jednym razem, a docelowa za jednym razem ją zapisuje.
+
+Ustawienie obowiązuje, dopóki nie zmienisz go opcją **O** albo nie
+uruchomisz MILF ponownie; **Esc** przy pytaniu o rozszerzenie zostawia je
+bez zmian.
+
+Liczba porcji potrzebnych do skopiowania całej dyskietki, przy typowym
+buforze w pamięci podstawowej (180 / 90 sektorów):
+
+| Dyskietka | Sektory | 64 KB, bez rozszerzenia | 130XE (64 KB rozszerzenia) | 256 KB rozszerzenia | 512 KB rozszerzenia | 1 MB rozszerzenia |
+|---|---|---|---|---|---|---|
+| SS SD | 720 × 128 B | 4 | 2 | 1 | 1 | 1 |
+| SS ED | 1040 × 128 B | 6 | 2 | 1 | 1 | 1 |
+| SS DD | 720 × 256 B | 8 | 3 | 1 | 1 | 1 |
+| DS DD | 1440 × 256 B | 16 | 5 | 2 | 1 | 1 |
+| DS QD | 2880 × 256 B | 32 | 9 | 3 | 2 | 1 |
 
 ### O – Set options (ustawienia)
 
